@@ -54,8 +54,10 @@ def get_coordinate(spacecraft,time_shock):
     path = coord_dict.get(spacecraft)
     if path is not None:
         data = spz.get_data(path, time_shock-timedelta(minutes=10), time_shock+timedelta(minutes=10))
-        return data.time, data.values
-    raise Exception("Satellite not found")
+        time, coord = data.time, data.values
+        index = find_nearest(time, np.datetime64(time_shock)) # finds the closest time in the list of times to the shock time
+        return time[index], coord[index]
+    raise Exception("Satellite not found")  
     
 def satellite_info(spacecraft, time_shock):
     """
@@ -65,10 +67,9 @@ def satellite_info(spacecraft, time_shock):
         time_shock - the time of the shock
     """
     time, coord = get_coordinate(spacecraft, time_shock)
-    index = find_nearest(time, np.datetime64(time_shock)) # finds the closest time in the list of times to the shock time
-    print("The time is:",to_datetime(time[index]))
-    print("The satellite coordinates are:",coord[index])
-
+    print("The time is:",to_datetime(time))
+    print("The satellite coordinates are:",coord)
+    
 # Function to get magnetic field at any satellite
 def get_Bfield(spacecraft, start_date, end_date):
     """
